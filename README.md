@@ -8,26 +8,26 @@ Before starting, be sure to set the maximum frequency of the oscillator (Simulat
 After running the simulation and the oscillator, select the "hand" tool and click on the green
 button near the display (`ON/OFF`) and wait for the result =)
 
-1. [Computer](#1.-Computer)
-    1. [Interface](#1.1-Interface)
-    2. [Architecture](#1.2-Architecture)
-    3. [BIOS](#1.3-BIOS)
-        1. [Initialization](#1.3.1-Initialization)
-        2. [Vector Table](#1.3.2-Vector-Table)
+1. [Computer](#1-Computer)
+    1. [Interface](#11-Interface)
+    2. [Architecture](#12-Architecture)
+    3. [BIOS](#13-BIOS)
+        1. [Initialization](#131-Initialization)
+        2. [Vector Table](#132-Vector-Table)
             * [INT 3h](#INT-3h)
             * [INT 4h](#INT-4h)
             * [INT 5h](#INT-5h)
             * [INT 6h](#INT-6h)
             * [INT 7h](#INT-7h)
-2. [CPU](#2.-CPU)
-    1. [Description](#2.1-Description)
-    2. [Modules](#2.2-Modules)
-        1. [Control Unit](#2.2.1-Control-Unit)
-        2. [ALU](#2.2.2-ALU)
-        3. [Registers](#2.2.3-Registers)
-        4. [Flags](#2.2.4-Flags)
-    3. [ISA](#2.3-ISA)
-3. [Programming](#Programming)
+2. [CPU](#2-CPU)
+    1. [Description](#21-Description)
+    2. [Modules](#22-Modules)
+        1. [Control Unit](#221-Control-Unit)
+        2. [ALU](#222-ALU)
+        3. [Registers](#223-Registers)
+        4. [Flags](#224-Flags)
+    3. [ISA](#23-ISA)
+3. [Programming](#3-Programming)
 
 ## 1. Computer
 ### 1.1 Interface
@@ -270,7 +270,7 @@ The flags indicate the current state of the processor or the result of some oper
 
 The table above shows the instruction set (ISA) for this processor. The MSC-8 (ISA for intel 8008) is taken as a basis (like the processor itself), but with improvements and modifications for my tasks. A more detailed description of the ISA can be found [here](https://docs.google.com/spreadsheets/d/1ht68J6B6FNXPJV-Rl-5vgTjGJbA4mdbe5pMpLTFEx3M/edit#gid=0) (Google Tables).
 
-### Programming
+### 3. Programming
 This computer can be programmed. You can run your programs in two ways:
 1. Write the program code to BIOS ROM
 2. Write the program code to one of the drives (internal or external)

@@ -61,6 +61,11 @@ class WrongOperandValue(ExceptionWithLineNumber):
                          f' you have {have}', line_num)
 
 
+class NameIsNotDefined(ExceptionWithLineNumber):
+    def __init__(self, line_num, name):
+        super().__init__(f"Name \"{name}\" is not defined", line_num)
+
+
 class Token:
     def __init__(self, cls, group=None, subgroup=None, name=None):
         self.cls = cls
@@ -91,7 +96,7 @@ class Token:
             if not isinstance(line[i], pattern[i]):
                 raise WrongParameterException(line_num, line[i].name)
 
-    def generate(self, line, pos):
+    def generate(self, line, pos, l_num):
         return []
 
     def __repr__(self):
@@ -279,7 +284,7 @@ class Instruction(Action):
             if line[i].allocate != alloc_need:
                 raise WrongOperandSize(line_num, alloc_need, line[i])
 
-    def generate(self, line, pos):
+    def generate(self, line, pos, l_num):
         # Transition
         ret = 0b00_000_011
         call = 0b01_000_010
@@ -619,12 +624,15 @@ class Immediate(Operand):
             self.allocate = 1   # BYTE
         elif -32768 <= self.value <= 65535:
             self.allocate = 2   # WORD
-        elif (2 ^ (8 * 4)) / -2 <= self.value <= (2 ^ (8 * 4)) - 1:
+        elif (2 ** (8 * 4)) / -2 <= self.value <= (2 ** (8 * 4)) - 1:
             self.allocate = 4   # DWORD
-        elif (2 ^ (8 * 8)) - 2 <= self.value <= (2 ^ (8 * 8)) - 1:
+        elif (2 ** (8 * 8)) - 2 <= self.value <= (2 ** (8 * 8)) - 1:
             self.allocate = 8   # QWORD
-        elif (2 ^ (8 * 10)) / 2 <= self.value <= (2 ^ (8 * 10)) - 1:
+        elif (2 ** (8 * 10)) / 2 <= self.value <= (2 ** (8 * 10)) - 1:
             self.allocate = 10  # 10 BYTES
+        else:
+            print(type(self.value), self.value)
+            raise TypeError
 
     def _set_size(self):
         # self.size = self.allocate
@@ -633,7 +641,7 @@ class Immediate(Operand):
         else:
             self.size = self.allocate
 
-    def generate(self, line, pos):
+    def generate(self, line, pos, l_num):
         if isinstance(self.value, str):
             zeros = ((self.allocate * (
                     (len(self.value) // self.allocate) +
@@ -738,11 +746,14 @@ class Name(Operand, Token):
     def __repr__(self):
         return f'[{self.cls}: {self.group}: "{self.name}": {self.value}]'
 
-    def generate(self, line, pos):
+    def generate(self, line, pos, l_num):
+        ret = []
         if pos:
-            return [i for i in self.value.to_bytes(self.allocate, 'little',
-                                                   signed=True)]
-        return []
+            if self.value is None:
+                raise NameIsNotDefined(l_num, self.name)
+            ret = [i for i in self.value.to_bytes(self.allocate, 'little',
+                                                    signed=True)]
+        return ret
 
 
 class Label(Name):
@@ -784,7 +795,7 @@ class Label(Name):
         self.allocate = 2
         self.size = 2
 
-    def generate(self, line, pos):
+    def generate(self, line, pos, l_num):
         if pos:
             return [i for i in self.value.to_bytes(self.allocate, 'little',
                                                    signed=False)]
@@ -841,7 +852,7 @@ class Variable(Name):
         # DQ        QWORD   8 bytes
         # DT        TBYTE   10 bytes
 
-    def generate(self, line, pos):
+    def generate(self, line, pos, l_num):
         if pos:
             if isinstance(self.value, str):
                 return [ch for ch in bytes(self.value, encoding='ascii')]
@@ -880,7 +891,7 @@ class Symbol(Name):
         self.allocate = 1
         self.size = 1
 
-    def generate(self, line, pos):
+    def generate(self, line, pos, l_num):
         if line[pos - 1].name in ('in', 'out'):
             return []
         if pos:
@@ -1089,7 +1100,10 @@ class Lexer:
     def listing_gen(self):
         for l_num, line in self._table.items():
             for pos in range(len(line)):
-                self.listing += line[pos].generate(line, pos)
+                try:
+                    self.listing += line[pos].generate(line, pos, l_num)
+                except AttributeError:
+                    raise NameIsNotDefined(l_num, line[pos].name)
         return self.listing
 
     def listing_to_txt_hex(self):

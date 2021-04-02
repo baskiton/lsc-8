@@ -212,8 +212,8 @@ CLEAR_SCREEN endp
 ;----------------------------------------
 ; Write Character at the current position
 ; INPUT
+;   (B) Char to write
 ;   (C) Count of Characters to write
-;   (D) Char to write
 ; OUTPUT
 ;   NONE
 ;----------------------------------------
@@ -230,7 +230,7 @@ WRITE_CH endp
 ;----------------------------------------
 ; Convert and Write a number to ASCII
 ; INPUT
-;   (D) Number to ASCII
+;   (B) Number to ASCII
 ; OUTPUT
 ;   NONE
 ;----------------------------------------
@@ -345,8 +345,8 @@ WRITE_STR endp
 ;   (A)=12(0Ch) - Clear buffer before input and call function from (B)
 ;       (B) - Number of function to call
 ; OUTPUT
-;	AS NOTED ABOVE, ONLY (A) AND FLAGS CHANGED
-;	ALL REGISTERS PRESERVED
+;   AS NOTED ABOVE, ONLY (A) AND FLAGS CHANGED
+;   ALL REGISTERS PRESERVED
 ;----------------------------------------
 KEYBOARD_IO proc
 K0:
@@ -610,7 +610,7 @@ STRG_SETUP endp
 ;----------------------------------------
 RESET label near
 START:
-    cli	    ; DISABLE INTERRUPTS
+    cli     ; DISABLE INTERRUPTS
 
 ;----- TEST OF REGISTERS
     mov a, 0FFh
